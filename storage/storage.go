@@ -8,7 +8,7 @@ import (
 
 const (
 	// Default expiration time
-	DefaultExpiration time.Duration = 0
+	DefaultExpiration time.Duration = -1
 	// nil value
 	NIL = "(nil)"
 )
@@ -36,7 +36,7 @@ func New() *MemoryCache {
 func (m *MemoryCache) Set(key string, value interface{}) (err error) {
 	m.items[key] = Item{
 		Object:     value,
-		Expiration: 0,
+		Expiration: int64(DefaultExpiration),
 	}
 
 	return
@@ -55,6 +55,25 @@ func (m *MemoryCache) Get(key string) (value string, err error) {
 		err = errKeyHold
 	}
 
+	return
+}
+
+// Remove the specified keys.
+func (m *MemoryCache) Remove(key string) {
+	delete(m.items, key)
+	return
+}
+
+// Set expiration time for specified key
+func (m *MemoryCache) SetTTL(key string, d time.Duration) {
+
+	e := int64(DefaultExpiration)
+	if d > 0 {
+		e = time.Now().Add(d).Unix()
+	}
+	value := m.items[key]
+	value.Expiration = int64(e)
+	m.items[key] = value
 	return
 }
 
@@ -104,7 +123,7 @@ func (m *MemoryCache) LPush(key string, values ...string) (err error) {
 		list = v
 
 	case nil:
-		list = make([]string, len(values))
+		list = make([]string, 0)
 
 	default:
 		err = errKeyHold
@@ -118,4 +137,26 @@ func (m *MemoryCache) LPush(key string, values ...string) (err error) {
 	m.Set(key, list)
 	return
 
+}
+
+// Get element from a list by its index
+func (m *MemoryCache) Lindex(key string, i int) (value string) {
+	switch v := m.items[key].Object.(type) {
+	case []string:
+		n := len(v)
+		if i >= 0 && i < n {
+			value = v[i]
+			break
+		}
+		if i >= -n && i < 0 {
+			value = v[n+i]
+			break
+		}
+		value = NIL
+
+	default:
+		value = NIL
+
+	}
+	return
 }
