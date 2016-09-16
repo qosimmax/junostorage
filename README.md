@@ -65,15 +65,40 @@ $ ./juno-server
 #### Telnet
 There is the option to use a plain telnet connection. The default output through telnet is [RESP](http://redis.io/topics/protocol).
 
-```
-telnet localhost 6380
-ping
-+PONG
-set mykey hello
+```telnet localhost 6380
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+
+SET storage redis
 +OK
-get mykey
+
+GET storage
 $5
-hello
+redis
+
+ping        
++PONG
+
+LPUSH list 0 1 2 3 4 5
+:6
+
+LINDEX list
+-ERR wrong number of arguments for 'lindex' command
+
+LINDEX list 0
+$1
+5
+
+HSET person name nemo
+:1
+
+HSET person age 25
+:1
+
+quit
++OK
+Connection closed by foreign host.
 
 
 ```
