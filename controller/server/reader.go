@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/test_task/resp"
+	"github.com/junostorage/resp"
 )
 
 // Type is resp type
