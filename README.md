@@ -1,5 +1,5 @@
 
-junostorage is th simple implementation of Redis-like in-memory cache.
+**junostorage** is th simple implementation of Redis-like in-memory cache.
 
 
 
@@ -36,7 +36,7 @@ Redis dict commands
 
 ### Building junostorage
 
-junostorage can be compiled and used on Linux, OSX, Windows
+**junostorage** can be compiled and used on Linux, OSX, Windows
 
 To build project:
 ```
