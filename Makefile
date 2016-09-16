@@ -7,9 +7,9 @@ test:
 cover:
 	@./build.sh cover
 install: all
-	sudo cp server /usr/local/bin
+	sudo cp cache-server /usr/local/bin
 
 uninstall:
-	rm -f /usr/local/bin/server
+	rm -f /usr/local/bin/cache-server
 package:
 	@./build.sh package

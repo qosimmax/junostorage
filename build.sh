@@ -69,7 +69,7 @@ trap rmtemp EXIT
 
 if [ "$NOCOPY" != "1" ]; then
 	# copy all files to an isloated directory.
-	WD="$TMP/src/github.com/test_task"
+	WD="$TMP/src/github.com/junostorage"
 	export GOPATH="$TMP"
 	for file in `find . -type f`; do
 		# TODO: use .gitignore to ignore, or possibly just use git to determine the file list.
