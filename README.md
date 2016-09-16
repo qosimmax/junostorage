@@ -65,7 +65,8 @@ $ ./juno-server
 #### Telnet
 There is the option to use a plain telnet connection. The default output through telnet is [RESP](http://redis.io/topics/protocol).
 
-```telnet localhost 6380
+```
+telnet localhost 6380
 Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
