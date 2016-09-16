@@ -299,45 +299,33 @@ func (rd *Reader) readTelnetMultiBulk() (v Value, n int, err error) {
 	values := make([]Value, 0, 8)
 	var c byte
 	var bline []byte
-	var quote, mustspace bool
+
 	for {
 		c, err = rd.rd.ReadByte()
 		if err != nil {
 			return nullValue, n, err
 		}
 		n += 1
+
 		if c == '\n' {
 			if len(bline) > 0 && bline[len(bline)-1] == '\r' {
 				bline = bline[:len(bline)-1]
 			}
 			break
 		}
-		if mustspace && c != ' ' {
-			return nullValue, n, &errProtocol{"unbalanced quotes in request"}
-		}
+
 		if c == ' ' {
-			if quote {
-				bline = append(bline, c)
-			} else {
+
+			if bline != nil {
 				values = append(values, Value{typ: '$', str: bline})
 				bline = nil
 			}
-		} else if c == '"' {
-			if quote {
-				mustspace = true
-			} else {
-				if len(bline) > 0 {
-					return nullValue, n, &errProtocol{"unbalanced quotes in request"}
-				}
-				quote = true
-			}
+
 		} else {
 			bline = append(bline, c)
 		}
 	}
-	if quote {
-		return nullValue, n, &errProtocol{"unbalanced quotes in request"}
-	}
+
 	if len(bline) > 0 {
 		values = append(values, Value{typ: '$', str: bline})
 	}
