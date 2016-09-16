@@ -10,13 +10,13 @@ func TestDialClinet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Dial error:%v", err)
 	}
-	val, err := con.Do("SET", "mykey", "111")
+	val, err := con.Do("SET", "storage", "redis")
 	if err != nil {
 		t.Fatalf("On cmd send error:%v", err)
 	}
 
 	if val.Error() != nil {
-		t.Fatalf("resp error:%v", err)
+		t.Fatalf("resp error:%v", val.Error())
 	}
 
 }
