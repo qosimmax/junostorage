@@ -1,8 +1,8 @@
-junostorage Client
+junostorage Client API
 =============
 
 
-junostorage Client is a [Go](http://golang.org/)
+junostorage Client API is a [Go](http://golang.org/)
 
 ## Examples
 
