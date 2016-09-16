@@ -45,6 +45,7 @@ func handleConn(
 	opened func(conn *Conn),
 	closed func(conn *Conn),
 ) {
+
 	opened(conn)
 	defer closed(conn)
 

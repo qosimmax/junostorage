@@ -17,10 +17,10 @@ package(){
 	rm -rf packages/$bdir && mkdir -p packages/$bdir
 	GOOS=$2 GOARCH=$3 ./build.sh
 	if [ "$2" == "windows" ]; then
-		mv cache-server packages/$bdir/cache-server.exe
+		mv juno-server packages/$bdir/juno-server.exe
 
 	else
-		mv cache-server packages/$bdir
+		mv juno-server packages/$bdir
 
 	fi
 	cp README.md packages/$bdir
@@ -73,7 +73,7 @@ if [ "$NOCOPY" != "1" ]; then
 	export GOPATH="$TMP"
 	for file in `find . -type f`; do
 		# TODO: use .gitignore to ignore, or possibly just use git to determine the file list.
-		if [[ "$file" != "." && "$file" != ./.git* && "$file" != ./data* && "$file" != ./cache-server* ]]; then
+		if [[ "$file" != "." && "$file" != ./.git* && "$file" != ./data* && "$file" != ./juno-server* ]]; then
 			mkdir -p "$WD/$(dirname "${file}")"
 			cp -P "$file" "$WD/$(dirname "${file}")"
 		fi
@@ -83,7 +83,7 @@ fi
 
 # test if requested
 if [ "$1" == "test" ]; then
-	$OD/cache-server -p 6380  &
+	$OD/juno-server -p 6380  &
 	PID=$!
 	function testend {
 		kill $PID &
@@ -94,7 +94,7 @@ fi
 
 # cover if requested
 if [ "$1" == "cover" ]; then
-	$OD/cache-server  -p 6380  &
+	$OD/juno-server  -p 6380  &
 	PID=$!
 	function testend {
 		kill $PID &
@@ -105,4 +105,4 @@ fi
 
 
 # build and store objects into original directory.
-go build -ldflags "$LDFLAGS" -o "$OD/cache-server" cmd/cache-server/*.go
+go build -ldflags "$LDFLAGS" -o "$OD/juno-server" cmd/juno-server/*.go
