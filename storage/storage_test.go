@@ -1,6 +1,9 @@
 package storage
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestSetGet(t *testing.T) {
 	key := "My"
@@ -22,7 +25,7 @@ func TestSetGet(t *testing.T) {
 
 }
 
-func TestHSetHGet(t *testing.T) {
+func TestDictValues(t *testing.T) {
 	key := "My"
 	field := "age"
 	value := "20"
@@ -44,18 +47,46 @@ func TestHSetHGet(t *testing.T) {
 		t.Errorf("Want: %s, got: %s", value, got)
 	}
 
+	if _, err := memcache.HGetAll(key); err != nil {
+		t.Fatalf("HGetAll error:%v", err)
+	}
+
 }
 
-func TestLPush(t *testing.T) {
+func TestListValues(t *testing.T) {
 	key := "list"
 	memcache := New()
 	values := []string{"1", "2", "3"}
+
 	if err := memcache.LPush(key, values...); err != nil {
-		t.Fatalf("LPush error:%v", err)
+		t.Fatalf("LPUSH error:%v", err)
 	}
 
-	if err := memcache.LPush(key, "4", "5", "6"); err != nil {
-		t.Fatalf("LPush error:%v", err)
+	if _, err := memcache.Llen(key); err != nil {
+		t.Fatalf("LLEN error:%v", err)
+	}
+
+	if _, err := memcache.Lindex(key, -1); err != nil {
+		t.Fatalf("LINDEX error:%v", err)
+	}
+
+	if _, err := memcache.LPop(key); err != nil {
+		t.Fatalf("LPOP error:%v", err)
+	}
+
+}
+
+func TestExpireKey(t *testing.T) {
+	key := "storage"
+	value := "redis"
+
+	memcache := New()
+	if err := memcache.Set(key, value); err != nil {
+		t.Fatalf("Set error:%v", err)
+	}
+
+	if err := memcache.SetTTL(key, 60*time.Duration(time.Second)); err != nil {
+		t.Fatalf("TTL error:%v", err)
 	}
 
 }
