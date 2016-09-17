@@ -3,6 +3,8 @@ package storage
 import (
 	"errors"
 	"time"
+
+	"github.com/junostorage/utils/glob"
 )
 
 const (
@@ -239,6 +241,20 @@ func (m *MemoryCache) LPop(key string) (value string, err error) {
 	default:
 		err = errKeyHold
 
+	}
+	return
+}
+
+// Returns all keys matching pattern.
+func (m *MemoryCache) Keys(pattern string) (values []string, err error) {
+	for key := range m.items {
+		matched, err := glob.Match(pattern, key)
+		if err != nil {
+			return nil, err
+		}
+		if matched {
+			values = append(values, key)
+		}
 	}
 	return
 }

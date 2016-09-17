@@ -76,6 +76,22 @@ func TestListValues(t *testing.T) {
 
 }
 
+func TestKeys(t *testing.T) {
+	key := "storage"
+	value := "redis"
+	pattern := "*"
+
+	memcache := New()
+	if err := memcache.Set(key, value); err != nil {
+		t.Fatalf("Set error:%v", err)
+	}
+
+	if _, err := memcache.Keys(pattern); err != nil {
+		t.Fatalf("KEYS error:%v", err)
+	}
+
+}
+
 func TestExpireKey(t *testing.T) {
 	key := "storage"
 	value := "redis"
