@@ -164,13 +164,8 @@ func (c *Controller) cmdHgetAll(msg *server.Message) (res string, err error) {
 	key := msg.Values[1].String()
 
 	values, err := c.cache.HGetAll(key)
-	if err != nil {
 
-		if err == storage.ErrNullValue {
-			data, _ := resp.NullValue().MarshalRESP()
-			return string(data), nil
-		}
-
+	if err != nil && err != storage.ErrNullValue {
 		return "", err
 	}
 

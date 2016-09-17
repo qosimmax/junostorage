@@ -29,8 +29,8 @@ const (
 )
 
 var (
-	errKeyHold   = errors.New("Key holding the wrong kind of value")
-	ErrNullValue = errors.New("Null value")
+	errKeyHold   = errors.New("Operation against a key holding the wrong kind of value")
+	ErrNullValue = errors.New("Key not found")
 )
 
 type Item struct {
@@ -145,6 +145,7 @@ func (m *MemoryCache) HGetAll(key string) (values []string, err error) {
 		for k := range v {
 			values = append(values, k, v[k])
 		}
+
 	case nil:
 		err = ErrNullValue
 
