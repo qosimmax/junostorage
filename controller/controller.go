@@ -121,12 +121,24 @@ func (c *Controller) handleInputCommand(conn *server.Conn, msg *server.Message, 
 	default:
 		c.mu.RLock()
 		defer c.mu.RUnlock()
-	case "set", "del", "hset", "hgetall", "hdel", "lpop", "lpush", "expire":
+
+	case storage.CmdSet,
+		storage.CmdDel,
+		storage.CmdHset,
+		storage.CmdHdel,
+		storage.CmdLpush,
+		storage.CmdLpop,
+		storage.CmdExpire:
 		// write operations
 		c.mu.Lock()
 		defer c.mu.Unlock()
 
-	case "get", "keys", "hget", "lindex", "llen":
+	case storage.CmdGet,
+		storage.CmdKeys,
+		storage.CmdHget,
+		storage.CmdHgetAll,
+		storage.CmdLindex,
+		storage.CmdLlen:
 		// read operations
 		c.mu.RLock()
 		defer c.mu.RUnlock()
@@ -152,43 +164,43 @@ func (c *Controller) command(msg *server.Message, w io.Writer) (res string, err 
 	switch msg.Command {
 	default:
 		err = fmt.Errorf("unknown command '%s'", msg.Values[0])
-	case "get":
+	case storage.CmdGet:
 		res, err = c.cmdGet(msg)
 
-	case "set":
+	case storage.CmdSet:
 		res, err = c.cmdSet(msg)
 
-	case "keys":
+	case storage.CmdKeys:
 		res, err = c.cmdKeys(msg)
 
-	case "hset":
+	case storage.CmdHset:
 		res, err = c.cmdHset(msg)
 
-	case "hget":
+	case storage.CmdHget:
 		res, err = c.cmdHget(msg)
 
-	case "hgetall":
+	case storage.CmdHgetAll:
 		res, err = c.cmdHgetAll(msg)
 
-	case "hdel":
+	case storage.CmdHdel:
 		res, err = c.cmdHdel(msg)
 
-	case "del":
+	case storage.CmdDel:
 		res, err = c.cmdDel(msg)
 
-	case "lpush":
+	case storage.CmdLpush:
 		res, err = c.cmdLpush(msg)
 
-	case "lindex":
+	case storage.CmdLindex:
 		res, err = c.cmdLIndex(msg)
 
-	case "llen":
+	case storage.CmdLlen:
 		res, err = c.cmdLen(msg)
 
-	case "lpop":
+	case storage.CmdLpop:
 		res, err = c.cmdLpop(msg)
 
-	case "expire":
+	case storage.CmdExpire:
 		res, err = c.cmdExpire(msg)
 
 	}

@@ -12,6 +12,22 @@ const (
 	DefaultExpiration time.Duration = -1
 )
 
+const (
+	CmdSet     = "set"
+	CmdGet     = "get"
+	CmdKeys    = "keys"
+	CmdDel     = "del"
+	CmdHset    = "hset"
+	CmdHget    = "hget"
+	CmdHdel    = "hdel"
+	CmdHgetAll = "hgetall"
+	CmdLpush   = "lpush"
+	CmdLlen    = "llen"
+	CmdLindex  = "lindex"
+	CmdLpop    = "lpop"
+	CmdExpire  = "expire"
+)
+
 var (
 	errKeyHold   = errors.New("Key holding the wrong kind of value")
 	ErrNullValue = errors.New("Null value")
