@@ -101,5 +101,5 @@ func (ar *AnyReaderWriter) readMultiBulkMessage() (*Message, error) {
 		return nil, nil
 	}
 
-	return &Message{Command: commandValues(values), Values: values, ConnType: RESP, OutputType: RESP}, nil
+	return &Message{Command: commandValues(values), Values: values, ConnType: Telnet, OutputType: RESP}, nil
 }
