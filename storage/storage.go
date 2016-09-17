@@ -66,8 +66,11 @@ func (m *MemoryCache) Del(key string) bool {
 }
 
 // Set expiration time for specified key
-func (m *MemoryCache) SetTTL(key string, d time.Duration) {
+func (m *MemoryCache) SetTTL(key string, d time.Duration) error {
 
+	if _, ok := m.items[key]; !ok {
+		return ErrNullValue
+	}
 	e := int64(DefaultExpiration)
 	if d > 0 {
 		e = time.Now().Add(d).Unix()
@@ -76,7 +79,7 @@ func (m *MemoryCache) SetTTL(key string, d time.Duration) {
 	value.Expiration = int64(e)
 	m.items[key] = value
 	m.expires[key] = true
-	return
+	return nil
 }
 
 // Set the string value of the field

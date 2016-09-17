@@ -30,8 +30,7 @@ func (c *Controller) cmdGet(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.RESP:
-		oval := resp.StringValue(value)
-		data, err := oval.MarshalRESP()
+		data, err := resp.StringValue(value).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -58,8 +57,7 @@ func (c *Controller) cmdSet(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.RESP:
-		oval := resp.SimpleStringValue("OK")
-		data, err := oval.MarshalRESP()
+		data, err := resp.SimpleStringValue("OK").MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -85,8 +83,7 @@ func (c *Controller) cmdDel(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.RESP:
-		oval := resp.IntegerValue(val)
-		data, err := oval.MarshalRESP()
+		data, err := resp.IntegerValue(val).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -113,8 +110,7 @@ func (c *Controller) cmdHset(msg *server.Message) (res string, err error) {
 	}
 	switch msg.OutputType {
 	case server.RESP:
-		oval := resp.IntegerValue(1)
-		data, err := oval.MarshalRESP()
+		data, err := resp.IntegerValue(1).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -146,11 +142,9 @@ func (c *Controller) cmdHget(msg *server.Message) (res string, err error) {
 		return "", err
 	}
 
-	oval := resp.StringValue(value)
-
 	switch msg.OutputType {
 	case server.RESP:
-		data, err := oval.MarshalRESP()
+		data, err := resp.StringValue(value).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -187,8 +181,7 @@ func (c *Controller) cmdHgetAll(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.RESP:
-		oval := resp.ArrayValue(vals)
-		data, err := oval.MarshalRESP()
+		data, err := resp.ArrayValue(vals).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -224,8 +217,7 @@ func (c *Controller) cmdHdel(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.RESP:
-		oval := resp.IntegerValue(n)
-		data, err := oval.MarshalRESP()
+		data, err := resp.IntegerValue(n).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -262,8 +254,7 @@ func (c *Controller) cmdLpush(msg *server.Message) (res string, err error) {
 	switch msg.OutputType {
 	case server.RESP:
 		n, _ := c.cache.Llen(key)
-		oval := resp.IntegerValue(n)
-		data, err := oval.MarshalRESP()
+		data, err := resp.IntegerValue(n).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -296,8 +287,7 @@ func (c *Controller) cmdLen(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.RESP:
-		oval := resp.IntegerValue(n)
-		data, err := oval.MarshalRESP()
+		data, err := resp.IntegerValue(n).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -331,8 +321,7 @@ func (c *Controller) cmdLIndex(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.RESP:
-		oval := resp.StringValue(value)
-		data, err := oval.MarshalRESP()
+		data, err := resp.StringValue(value).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -364,8 +353,7 @@ func (c *Controller) cmdLpop(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.RESP:
-		oval := resp.StringValue(value)
-		data, err := oval.MarshalRESP()
+		data, err := resp.StringValue(value).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
@@ -385,12 +373,18 @@ func (c *Controller) cmdExpire(msg *server.Message) (res string, err error) {
 	key := msg.Values[1].String()
 	value := msg.Values[2].Integer()
 
-	c.cache.SetTTL(key, time.Duration(value)*time.Second)
+	if err = c.cache.SetTTL(key, time.Duration(value)*time.Second); err != nil {
+		if err == storage.ErrNullValue {
+			data, _ := resp.IntegerValue(0).MarshalRESP()
+			return string(data), nil
+		}
+
+		return "", err
+	}
 
 	switch msg.OutputType {
 	case server.RESP:
-		oval := resp.IntegerValue(1)
-		data, err := oval.MarshalRESP()
+		data, err := resp.IntegerValue(1).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
