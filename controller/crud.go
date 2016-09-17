@@ -363,6 +363,36 @@ func (c *Controller) cmdLpop(msg *server.Message) (res string, err error) {
 	return
 }
 
+func (c *Controller) cmdKeys(msg *server.Message) (res string, err error) {
+
+	if len(msg.Values) != 2 {
+		err = errInvalidNumberOfArguments
+		return
+	}
+
+	pattern := msg.Values[1].String()
+
+	values, err := c.cache.Keys(pattern)
+	if err != nil {
+		return "", err
+	}
+
+	vals := make([]resp.Value, 0, 2)
+	for _, v := range values {
+		vals = append(vals, resp.StringValue(v))
+	}
+
+	switch msg.OutputType {
+	case server.RESP:
+		data, err := resp.ArrayValue(vals).MarshalRESP()
+		if err != nil {
+			return "", err
+		}
+		return string(data), nil
+	}
+	return
+}
+
 func (c *Controller) cmdExpire(msg *server.Message) (res string, err error) {
 
 	if len(msg.Values) != 3 {

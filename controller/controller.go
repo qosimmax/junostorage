@@ -126,7 +126,7 @@ func (c *Controller) handleInputCommand(conn *server.Conn, msg *server.Message, 
 		c.mu.Lock()
 		defer c.mu.Unlock()
 
-	case "get", "hget", "lindex", "llen":
+	case "get", "keys", "hget", "lindex", "llen":
 		// read operations
 		c.mu.RLock()
 		defer c.mu.RUnlock()
@@ -157,6 +157,9 @@ func (c *Controller) command(msg *server.Message, w io.Writer) (res string, err 
 
 	case "set":
 		res, err = c.cmdSet(msg)
+
+	case "keys":
+		res, err = c.cmdKeys(msg)
 
 	case "hset":
 		res, err = c.cmdHset(msg)
