@@ -10,6 +10,7 @@ Redis keys commands
 
 - `DEL` this command deletes the key, if exists
 - `EXPIRE` expires the key after the specified time
+- `KEYS` Find all keys matching the specified pattern
 
 Redis strings commands
 
@@ -139,7 +140,7 @@ func main() {
 		log.Fatalf("resp error:%v", val.Error())
 	}
 	log.Println(val)
-	
+
 	val, err = con.Do("GET", "storage")
 	if err != nil {
 		log.Fatalf("On GET error:%v", err)
@@ -149,4 +150,3 @@ func main() {
 }
 
 ```
-
