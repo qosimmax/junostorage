@@ -8,6 +8,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Sirupsen/logrus"
+	"github.com/junostorage/logger"
+
 	"github.com/junostorage/controller/server"
 	"github.com/junostorage/storage"
 
@@ -18,6 +21,10 @@ var (
 	errInvalidNumberOfArguments = errors.New("invalid number of arguments")
 )
 
+var (
+	logs *logrus.Logger
+)
+
 // Controller struct
 type Controller struct {
 	mu              sync.RWMutex
@@ -26,6 +33,10 @@ type Controller struct {
 	conns           map[*server.Conn]bool
 	statsTotalConns int
 	cache           *storage.MemoryCache
+}
+
+func init() {
+	logs = logger.GetLogger()
 }
 
 // ListenAndServe starts a new server
@@ -49,6 +60,7 @@ func ListenAndServeEx(host string, port int, ln *net.Listener) error {
 
 		err := c.handleInputCommand(conn, msg, w)
 		if err != nil {
+			logs.Error(err)
 			return err
 		}
 		return nil
@@ -82,7 +94,7 @@ func (c *Controller) handleInputCommand(conn *server.Conn, msg *server.Message, 
 
 		}
 	}
-	// Ping. Just send back the response. No need to put through the pipeline.
+	// Ping. Just send back the response.
 	if msg.Command == "ping" {
 		switch msg.OutputType {
 		case server.RESP:
@@ -123,6 +135,7 @@ func (c *Controller) handleInputCommand(conn *server.Conn, msg *server.Message, 
 
 	res, err := c.command(msg, w)
 	if err != nil {
+		logs.Error(err)
 		return writeErr(err)
 	}
 
