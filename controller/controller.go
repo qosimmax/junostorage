@@ -27,12 +27,13 @@ var (
 
 // Controller struct
 type Controller struct {
-	mu              sync.RWMutex
-	host            string
-	port            int
-	conns           map[*server.Conn]bool
-	statsTotalConns int
-	cache           *storage.MemoryCache
+	mu                     sync.RWMutex
+	host                   string
+	port                   int
+	conns                  map[*server.Conn]bool
+	statsTotalConns        int
+	stopBackgroundExpiring bool
+	cache                  *storage.MemoryCache
 }
 
 func init() {
@@ -55,6 +56,12 @@ func ListenAndServeEx(host string, port int, ln *net.Listener) error {
 
 	//run expire checker
 	go c.backgroundExpiring()
+
+	defer func() {
+		c.mu.Lock()
+		c.stopBackgroundExpiring = true
+		c.mu.Unlock()
+	}()
 
 	handler := func(conn *server.Conn, msg *server.Message, rd *server.AnyReaderWriter, w io.Writer) error {
 
@@ -211,14 +218,19 @@ func (c *Controller) command(msg *server.Message, w io.Writer) (res string, err 
 func (c *Controller) backgroundExpiring() {
 	for {
 		c.mu.Lock()
-		keys := c.cache.ExpireList()
+		if c.stopBackgroundExpiring {
+			c.mu.Unlock()
+			return
+		}
 
+		keys := c.cache.ExpireList()
 		for _, k := range keys {
 			if c.cache.IsExpire(k) {
 				c.cache.Del(k)
 			}
 		}
 		c.mu.Unlock()
-		time.Sleep(time.Second / 3)
+
+		time.Sleep(time.Duration(time.Second) * 2)
 	}
 }
