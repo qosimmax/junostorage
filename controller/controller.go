@@ -76,7 +76,7 @@ func (c *Controller) handleInputCommand(conn *server.Conn, msg *server.Message, 
 			err := fmt.Errorf("unsupported conn type: %v", msg.ConnType)
 			return err
 
-		case server.RESP:
+		case server.Telnet:
 			_, err := io.WriteString(w, res)
 			return err
 
