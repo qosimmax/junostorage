@@ -76,7 +76,7 @@ func ListenAndServeEx(host string, port int, httpPort int, ln *net.Listener) err
 
 		err := c.handleInputCommand(conn, msg, w)
 		if err != nil {
-			logs.Error(err)
+			logs.Errorf("handler error:%v", err)
 			return err
 		}
 		return nil
@@ -86,7 +86,7 @@ func ListenAndServeEx(host string, port int, httpPort int, ln *net.Listener) err
 
 		err := c.handleInputCommand(nil, msg, w)
 		if err != nil {
-			logs.Error(err)
+			logs.Errorf("http handler error:%v", err)
 			return err
 		}
 		return nil
@@ -183,7 +183,7 @@ func (c *Controller) handleInputCommand(conn *server.Conn, msg *server.Message, 
 
 	res, err := c.command(msg, w)
 	if err != nil {
-		logs.Error(err)
+		logs.Errorf("command error:%v", err)
 		return writeErr(err)
 	}
 
