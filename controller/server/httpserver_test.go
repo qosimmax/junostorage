@@ -35,7 +35,7 @@ func TestHTTPServer(t *testing.T) {
 
 		{
 			url: "http://localhost:6382/hgetall/person",
-			res: `{"status":true, "value":[name nemo age 25]}`,
+			res: `{"status":true, "value":"[name nemo age 25]"}`,
 		},
 
 		{
@@ -60,12 +60,12 @@ func TestHTTPServer(t *testing.T) {
 
 		{
 			url: "http://localhost:6382/lindex/list/1",
-			res: `{"status":true, "value":2}`,
+			res: `{"status":true, "value":"2"}`,
 		},
 
 		{
 			url: "http://localhost:6382/lpop/list",
-			res: `{"status":true, "value":3}`,
+			res: `{"status":true, "value":"3"}`,
 		},
 
 		{
