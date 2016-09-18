@@ -50,7 +50,7 @@ $ make test
 ```
 
 ## Running
-For command line invoke:
+For command line invoke(deafult service listen port 6380 and for http 6382):
 ```
 $ ./juno-server -h
 ```
@@ -61,6 +61,14 @@ To run a server:
 $ ./juno-server
 
 ```
+or with arguments
+
+```
+$ ./juno-server -p 6380 -http 6382
+
+```
+
+
 
 ## Network protocols
 
@@ -71,6 +79,7 @@ $ ./juno-server
 
 ```
 # call with request in the url path
+
  curl  localhost:6382/set/mkey/hallo
  {"status":true}
 
