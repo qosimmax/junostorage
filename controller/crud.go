@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/junostorage/controller/server"
@@ -22,23 +23,28 @@ func (c *Controller) cmdGet(msg *server.Message) (res string, err error) {
 
 		if err == storage.ErrNullValue {
 			data, _ := resp.NullValue().MarshalRESP()
-			return string(data), nil
+
+			if msg.OutputType == server.RESP {
+				return string(data), nil
+			}
 		}
 
 		return "", err
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "value":"%v"}`, value)
 	case server.RESP:
 		data, err := resp.StringValue(value).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
 
-		return string(data), nil
+		res = string(data)
 	}
 
-	return "", nil
+	return
 }
 
 func (c *Controller) cmdSet(msg *server.Message) (res string, err error) {
@@ -56,12 +62,15 @@ func (c *Controller) cmdSet(msg *server.Message) (res string, err error) {
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = `{"status":true}`
 	case server.RESP:
 		data, err := resp.SimpleStringValue("OK").MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 
 	}
 
@@ -82,16 +91,19 @@ func (c *Controller) cmdDel(msg *server.Message) (res string, err error) {
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "value":"%v"}`, val)
 	case server.RESP:
 		data, err := resp.IntegerValue(val).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 
 	}
 
-	return "", nil
+	return
 }
 
 func (c *Controller) cmdHset(msg *server.Message) (res string, err error) {
@@ -109,12 +121,15 @@ func (c *Controller) cmdHset(msg *server.Message) (res string, err error) {
 		return
 	}
 	switch msg.OutputType {
+	case server.JSON:
+		res = `{"status":true}`
 	case server.RESP:
 		data, err := resp.IntegerValue(1).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 
 	}
 
@@ -136,19 +151,25 @@ func (c *Controller) cmdHget(msg *server.Message) (res string, err error) {
 
 		if err == storage.ErrNullValue {
 			data, _ := resp.NullValue().MarshalRESP()
-			return string(data), nil
+
+			if msg.OutputType == server.RESP {
+				return string(data), nil
+			}
+
 		}
 
 		return "", err
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "field":"%v", "value":"%v"}`, field, value)
 	case server.RESP:
 		data, err := resp.StringValue(value).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+		res = string(data)
 	}
 
 	return
@@ -175,12 +196,15 @@ func (c *Controller) cmdHgetAll(msg *server.Message) (res string, err error) {
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "value":%v}`, vals)
 	case server.RESP:
 		data, err := resp.ArrayValue(vals).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 	}
 
 	return
@@ -204,19 +228,26 @@ func (c *Controller) cmdHdel(msg *server.Message) (res string, err error) {
 
 		if err == storage.ErrNullValue {
 			data, _ := resp.IntegerValue(0).MarshalRESP()
-			return string(data), nil
+
+			if msg.OutputType == server.RESP {
+				return string(data), nil
+			}
+
 		}
 
 		return "", err
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "value":%v}`, n)
 	case server.RESP:
 		data, err := resp.IntegerValue(n).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 	}
 
 	return
@@ -240,20 +271,27 @@ func (c *Controller) cmdLpush(msg *server.Message) (res string, err error) {
 
 		if err == storage.ErrNullValue {
 			data, _ := resp.IntegerValue(0).MarshalRESP()
-			return string(data), nil
+
+			if msg.OutputType == server.RESP {
+				return string(data), nil
+			}
 		}
 
 		return "", err
 	}
 
+	n, _ := c.cache.Llen(key)
+
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "value":%v}`, n)
 	case server.RESP:
-		n, _ := c.cache.Llen(key)
 		data, err := resp.IntegerValue(n).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 
 	}
 
@@ -274,19 +312,25 @@ func (c *Controller) cmdLen(msg *server.Message) (res string, err error) {
 
 		if err == storage.ErrNullValue {
 			data, _ := resp.IntegerValue(0).MarshalRESP()
-			return string(data), nil
+
+			if msg.OutputType == server.RESP {
+				return string(data), nil
+			}
 		}
 
 		return "", err
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "value":%v}`, n)
 	case server.RESP:
 		data, err := resp.IntegerValue(n).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 
 	}
 
@@ -308,19 +352,25 @@ func (c *Controller) cmdLIndex(msg *server.Message) (res string, err error) {
 
 		if err == storage.ErrNullValue {
 			data, _ := resp.NullValue().MarshalRESP()
-			return string(data), nil
+
+			if msg.OutputType == server.RESP {
+				return string(data), nil
+			}
 		}
 
 		return "", err
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "value":%v}`, value)
 	case server.RESP:
 		data, err := resp.StringValue(value).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 	}
 
 	return
@@ -340,19 +390,26 @@ func (c *Controller) cmdLpop(msg *server.Message) (res string, err error) {
 
 		if err == storage.ErrNullValue {
 			data, _ := resp.NullValue().MarshalRESP()
-			return string(data), nil
+
+			if msg.OutputType == server.RESP {
+				return string(data), nil
+			}
+
 		}
 
 		return "", err
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "value":%v}`, value)
 	case server.RESP:
 		data, err := resp.StringValue(value).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 	}
 
 	return
@@ -378,13 +435,17 @@ func (c *Controller) cmdKeys(msg *server.Message) (res string, err error) {
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "value":%v}`, vals)
 	case server.RESP:
 		data, err := resp.ArrayValue(vals).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 	}
+
 	return
 }
 
@@ -401,20 +462,27 @@ func (c *Controller) cmdExpire(msg *server.Message) (res string, err error) {
 	if err = c.cache.SetTTL(key, time.Duration(value)*time.Second); err != nil {
 		if err == storage.ErrNullValue {
 			data, _ := resp.IntegerValue(0).MarshalRESP()
-			return string(data), nil
+
+			if msg.OutputType == server.RESP {
+				return string(data), nil
+			}
 		}
 
 		return "", err
 	}
 
 	switch msg.OutputType {
+	case server.JSON:
+		res = fmt.Sprintf(`{"status":true, "value":%v}`, 1)
 	case server.RESP:
 		data, err := resp.IntegerValue(1).MarshalRESP()
 		if err != nil {
 			return "", err
 		}
-		return string(data), nil
+
+		res = string(data)
 	}
 
 	return
+
 }

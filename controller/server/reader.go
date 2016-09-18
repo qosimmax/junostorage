@@ -2,6 +2,7 @@ package server
 
 import (
 	"bufio"
+	"bytes"
 	"io"
 	"strings"
 
@@ -102,4 +103,25 @@ func (ar *AnyReaderWriter) readMultiBulkMessage() (*Message, error) {
 	}
 
 	return &Message{Command: commandValues(values), Values: values, ConnType: Telnet, OutputType: RESP}, nil
+}
+
+// ReadHTTPMessage reads the http path
+func (ar *AnyReaderWriter) ReadHTTPMessage() (*Message, error) {
+
+	line, _, err := ar.rd.ReadLine()
+	if err != nil {
+		return nil, err
+	}
+	values := make([]resp.Value, 0, 2)
+	list := bytes.Split(line, []byte("/"))
+	for _, v := range list {
+		s := string(v)
+		if s == "" {
+			continue
+		}
+		values = append(values, resp.StringValue(strings.ToLower(s)))
+	}
+
+	return &Message{Command: commandValues(values), Values: values, ConnType: HTTP, OutputType: JSON}, nil
+
 }

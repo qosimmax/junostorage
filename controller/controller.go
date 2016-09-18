@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"runtime"
 	"sync"
 	"time"
@@ -20,10 +21,7 @@ import (
 
 var (
 	errInvalidNumberOfArguments = errors.New("invalid number of arguments")
-)
-
-var (
-	logs *logrus.Logger
+	logs                        *logrus.Logger
 )
 
 const (
@@ -49,12 +47,12 @@ func init() {
 }
 
 // ListenAndServe starts a new server
-func ListenAndServe(host string, port int) error {
-	return ListenAndServeEx(host, port, nil)
+func ListenAndServe(host string, port int, httpPort int) error {
+	return ListenAndServeEx(host, port, httpPort, nil)
 }
 
 // ListenAndServeEx function
-func ListenAndServeEx(host string, port int, ln *net.Listener) error {
+func ListenAndServeEx(host string, port int, httpPort int, ln *net.Listener) error {
 
 	c := &Controller{
 		host:  host,
@@ -84,6 +82,16 @@ func ListenAndServeEx(host string, port int, ln *net.Listener) error {
 		return nil
 	}
 
+	httpHandler := func(msg *server.Message, w http.ResponseWriter) error {
+
+		err := c.handleInputCommand(nil, msg, w)
+		if err != nil {
+			logs.Error(err)
+			return err
+		}
+		return nil
+	}
+
 	opened := func(conn *server.Conn) {
 		c.mu.Lock()
 		c.conns[conn] = true
@@ -95,6 +103,10 @@ func ListenAndServeEx(host string, port int, ln *net.Listener) error {
 		delete(c.conns, conn)
 		c.mu.Unlock()
 	}
+
+	//run http server
+	go server.ListenHttpServer(host, httpPort, httpHandler)
+
 	return server.ListenAndServe(host, port, handler, opened, closed, ln)
 }
 
@@ -106,11 +118,15 @@ func (c *Controller) handleInputCommand(conn *server.Conn, msg *server.Message, 
 			err := fmt.Errorf("unsupported conn type: %v", msg.ConnType)
 			return err
 
+		case server.HTTP:
+			fmt.Fprintf(w, res)
+
 		case server.Telnet:
 			_, err := io.WriteString(w, res)
 			return err
 
 		}
+		return nil
 	}
 	// Ping. Just send back the response.
 	if msg.Command == "ping" {
@@ -123,6 +139,8 @@ func (c *Controller) handleInputCommand(conn *server.Conn, msg *server.Message, 
 
 	writeErr := func(err error) error {
 		switch msg.OutputType {
+		case server.JSON:
+			return writeOutput(fmt.Sprintf(`{"status":false, "error":"%v"}`, err))
 		case server.RESP:
 			if err == errInvalidNumberOfArguments {
 				return writeOutput("-ERR wrong number of arguments for '" + msg.Command + "' command\r\n")
