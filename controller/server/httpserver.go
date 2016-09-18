@@ -26,7 +26,7 @@ func ListenHttpServer(host string, port int,
 
 func Handler(httpHandler func(msg *Message, w http.ResponseWriter) error) http.HandlerFunc {
 	return func(wr http.ResponseWriter, r *http.Request) {
-
+		wr.Header().Set("Content-Type", "application/json")
 		buffer := bytes.NewBuffer([]byte(r.URL.Path))
 		reader := NewAnyReaderWriter(buffer)
 		msg, err := reader.ReadHTTPMessage()
