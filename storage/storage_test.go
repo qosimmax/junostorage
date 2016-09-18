@@ -26,7 +26,7 @@ func TestSetGet(t *testing.T) {
 }
 
 func TestDictValues(t *testing.T) {
-	key := "My"
+	key := "Dict"
 	field := "age"
 	value := "20"
 	memcache := New()

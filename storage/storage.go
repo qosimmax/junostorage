@@ -2,6 +2,7 @@ package storage
 
 import (
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/junostorage/utils/glob"
@@ -44,9 +45,17 @@ type MemoryCache struct {
 	//mu    sync.RWMutex
 }
 
+var (
+	memCache *MemoryCache
+	once     sync.Once
+)
+
 //Create new MemoryCache instance
 func New() *MemoryCache {
-	return &MemoryCache{items: make(map[string]Item), expires: make(map[string]bool)}
+	once.Do(func() {
+		memCache = &MemoryCache{items: make(map[string]Item), expires: make(map[string]bool)}
+	})
+	return memCache
 }
 
 // Sets the value at the specified key
