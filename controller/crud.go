@@ -207,7 +207,7 @@ func (c *Controller) cmdHgetAll(msg *server.Message) (res string, err error) {
 		res = string(data)
 	}
 
-	return
+	return res, nil
 }
 
 func (c *Controller) cmdHdel(msg *server.Message) (res string, err error) {
