@@ -67,10 +67,6 @@ func TestHTTPServer(t *testing.T) {
 			url: "http://localhost:6382/lpop/list",
 			res: `{"status":true, "value":3}`,
 		},
-		{
-			url: "http://localhost:6382/keys/*",
-			res: `{"status":true, "value":[storage mkey person list]}`,
-		},
 
 		{
 			url: "http://localhost:6382/del/mkey",
