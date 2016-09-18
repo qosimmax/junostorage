@@ -32,7 +32,6 @@ func ListenAndServe(
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
-			log.Println(err)
 			return err
 		}
 		go handleConn(&Conn{Conn: conn}, handler, opened, closed)
@@ -47,8 +46,8 @@ func handleConn(
 ) {
 
 	opened(conn)
-	defer closed(conn)
 
+	defer closed(conn)
 	defer conn.Close()
 
 	rd := NewAnyReaderWriter(conn)
@@ -56,7 +55,6 @@ func handleConn(
 	for {
 		msg, err := rd.ReadMessage()
 		if err != nil {
-			log.Println(err)
 			return
 		}
 
@@ -70,7 +68,6 @@ func handleConn(
 			}
 			err := handler(conn, msg, rd, conn)
 			if err != nil {
-				log.Println(err)
 				return
 			}
 
