@@ -62,6 +62,38 @@ $ ./juno-server
 
 ```
 
+## Network protocols
+
+
+#### HTTP
+ One of the simplest ways to call a command is to use HTTP. From the command line you can use [curl](https://curl.haxx.se/).
+ For example:
+
+```
+# call with request in the url path
+ curl  localhost:6382/set/mkey/hallo
+ {"status":true}
+
+ curl  localhost:6382/get/mkey
+ {"status":true, "value":"hallo"}
+
+ curl  localhost:6382/get/mkey
+ {"status":true, "value":"hallo"}
+
+curl  localhost:6382/hset/person/name/nemo
+{"status":true}
+
+curl localhost:6382/expire/mkey/10
+{"status":true, "value":1}
+
+curl localhost:6382/lpush/list/1/2/3
+{"status":true, "value":3}
+
+curl localhost:6382/expire/mkey
+{"status":false, "error":"invalid number of arguments"}
+
+```
+
 
 #### Telnet
 There is the option to use a plain telnet connection. The default output through telnet is [RESP](http://redis.io/topics/protocol).
