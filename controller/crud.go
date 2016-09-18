@@ -197,7 +197,7 @@ func (c *Controller) cmdHgetAll(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.JSON:
-		res = fmt.Sprintf(`{"status":true, "value":%v}`, vals)
+		res = fmt.Sprintf(`{"status":true, "value":"%v"}`, vals)
 	case server.RESP:
 		data, err := resp.ArrayValue(vals).MarshalRESP()
 		if err != nil {
@@ -363,7 +363,7 @@ func (c *Controller) cmdLIndex(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.JSON:
-		res = fmt.Sprintf(`{"status":true, "value":%v}`, value)
+		res = fmt.Sprintf(`{"status":true, "value":"%v"}`, value)
 	case server.RESP:
 		data, err := resp.StringValue(value).MarshalRESP()
 		if err != nil {
@@ -402,7 +402,7 @@ func (c *Controller) cmdLpop(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.JSON:
-		res = fmt.Sprintf(`{"status":true, "value":%v}`, value)
+		res = fmt.Sprintf(`{"status":true, "value":"%v"}`, value)
 	case server.RESP:
 		data, err := resp.StringValue(value).MarshalRESP()
 		if err != nil {
@@ -436,7 +436,7 @@ func (c *Controller) cmdKeys(msg *server.Message) (res string, err error) {
 
 	switch msg.OutputType {
 	case server.JSON:
-		res = fmt.Sprintf(`{"status":true, "value":%v}`, vals)
+		res = fmt.Sprintf(`{"status":true, "value":"%v"}`, vals)
 	case server.RESP:
 		data, err := resp.ArrayValue(vals).MarshalRESP()
 		if err != nil {
