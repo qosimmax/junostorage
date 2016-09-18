@@ -1,2 +1,2 @@
 juno-server*
-!cmd/juno-*
+!main/juno-*

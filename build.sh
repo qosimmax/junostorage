@@ -75,4 +75,4 @@ if [ "$1" == "cover" ]; then
 fi
 
 # build and store objects into original directory.
-go build -ldflags "$LDFLAGS" -o "$OD/juno-server" cmd/juno-server/*.go
+go build -ldflags "$LDFLAGS" -o "$OD/juno-server" main/juno-server/*.go
