@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"runtime"
 	"sync"
 	"time"
 
@@ -25,6 +26,11 @@ var (
 	logs *logrus.Logger
 )
 
+const (
+	//@TODO feature read maxmem value from conf file
+	maxmem = 1024 * 1024 * 1024 // 1GB
+)
+
 // Controller struct
 type Controller struct {
 	mu                     sync.RWMutex
@@ -33,6 +39,8 @@ type Controller struct {
 	conns                  map[*server.Conn]bool
 	statsTotalConns        int
 	stopBackgroundExpiring bool
+	stopWatchingMemory     bool
+	outOfMemory            bool
 	cache                  *storage.MemoryCache
 }
 
@@ -54,12 +62,15 @@ func ListenAndServeEx(host string, port int, ln *net.Listener) error {
 		conns: make(map[*server.Conn]bool),
 		cache: storage.New()}
 
-	//run expire checker
+	// watch memory
+	go c.watchMemory()
+	// expire checker
 	go c.backgroundExpiring()
 
 	defer func() {
 		c.mu.Lock()
 		c.stopBackgroundExpiring = true
+		c.stopWatchingMemory = true
 		c.mu.Unlock()
 	}()
 
@@ -216,7 +227,10 @@ func (c *Controller) command(msg *server.Message, w io.Writer) (res string, err 
 
 // backgroundExpiring watches for when items must expire from the cache
 func (c *Controller) backgroundExpiring() {
-	for {
+	t := time.NewTicker(time.Second * 2)
+	defer t.Stop()
+
+	for range t.C {
 		c.mu.Lock()
 		if c.stopBackgroundExpiring {
 			c.mu.Unlock()
@@ -231,6 +245,35 @@ func (c *Controller) backgroundExpiring() {
 		}
 		c.mu.Unlock()
 
-		time.Sleep(time.Duration(time.Second) * 2)
+	}
+}
+
+func (c *Controller) watchMemory() {
+	t := time.NewTicker(time.Second * 2)
+	defer t.Stop()
+	var mem runtime.MemStats
+
+	for range t.C {
+		func() {
+			c.mu.RLock()
+			if c.stopWatchingMemory {
+				c.mu.RUnlock()
+				return
+			}
+
+			oom := c.outOfMemory
+			c.mu.RUnlock()
+
+			if oom {
+				// runs a garbage collection
+				runtime.GC()
+			}
+			runtime.ReadMemStats(&mem)
+
+			c.mu.Lock()
+			c.outOfMemory = int(mem.HeapAlloc) > maxmem
+			c.mu.Unlock()
+
+		}()
 	}
 }
