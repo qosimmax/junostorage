@@ -58,38 +58,6 @@ export GO15VENDOREXPERIMENT=1
 cd $(dirname "${BASH_SOURCE[0]}")
 OD="$(pwd)"
 
-package(){
-	echo Packaging $1 Binary
-	bdir=tile38-${VERSION}-$2-$3
-	rm -rf packages/$bdir && mkdir -p packages/$bdir
-	GOOS=$2 GOARCH=$3 ./build.sh
-	if [ "$2" == "windows" ]; then
-		mv tile38-server packages/$bdir/tile38-server.exe
-		mv tile38-cli packages/$bdir/tile38-cli.exe
-	else
-		mv tile38-server packages/$bdir
-		mv tile38-cli packages/$bdir
-	fi
-	echo "1111111111111111"
-	cp README.md packages/$bdir
-	cd packages
-	if [ "$2" == "linux" ]; then
-		tar -zcf $bdir.tar.gz $bdir
-	else
-		zip -r -q $bdir.zip $bdir
-	fi
-	rm -rf $bdir
-	cd ..
-}
-
-if [ "$1" == "package" ]; then
-	rm -rf packages/
-	package "Windows" "windows" "amd64"
-	package "Mac" "darwin" "amd64"
-	package "Linux" "linux" "amd64"
-	package "FreeBSD" "freebsd" "amd64"
-	exit
-fi
 
 if [ "$1" == "vendor" ]; then
 	echo "222"
