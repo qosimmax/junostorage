@@ -105,7 +105,7 @@ curl localhost:6382/expire/mkey
 
 
 #### Telnet
-There is the option to use a plain telnet connection. The default output through telnet is [RESP](http://redis.io/topics/protocol).
+There is the possible to use a plain telnet connection. The default output through telnet is [RESP](http://redis.io/topics/protocol).
 
 ```
 telnet localhost 6380
@@ -191,3 +191,6 @@ func main() {
 }
 
 ```
+
+Optional features:
+not supported yet
