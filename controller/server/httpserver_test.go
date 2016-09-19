@@ -34,11 +34,6 @@ func TestHTTPServer(t *testing.T) {
 		},
 
 		{
-			url: "http://localhost:6382/hgetall/person",
-			res: `{"status":true, "value":"[name nemo age 25]"}`,
-		},
-
-		{
 			url: "http://localhost:6382/hdel/person/age",
 			res: `{"status":true, "value":1}`,
 		},
